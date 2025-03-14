@@ -1,0 +1,380 @@
+&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+
+&lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+    &lt;title&gt;山羊の前端小窝&lt;/title&gt;
+    &lt;!-- 导入字体 --&gt;
+    &lt;link rel=&quot;stylesheet&quot; href=&quot;https://fonts.googleapis.com/icon?family=Material+Icons&quot;&gt;
+    &lt;style&gt;
+        * {
+            padding: 0;
+            margin: 0;
+            font-family: &quot;优设标题黑&quot;;
+            -webkit-user-select:none;
+        }
+
+        body {
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            background-color: #6e7cf5;
+        }
+
+        .shell {
+            z-index: 99;
+            width: 330px;
+            height: 580px;
+            border-radius: 15px;
+            /* background-color: #fff6e7; */
+            box-shadow: 0 10px 30px #00000085;
+            /* 设置上高光和左高光，使其看起来更加逼真 */
+            border-top: 1px solid rgba(255, 255, 255, .9);
+            border-left: 1px solid rgba(255, 255, 255, .9);
+            background: linear-gradient(to right bottom,
+                    rgba(255, 255, 255, .6),
+                    rgba(255, 255, 255, .3),
+                    rgba(255, 255, 255, .2));
+            /* 重点：使元素背景模糊化 */
+            backdrop-filter: blur(16px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cover {
+            width: 280px;
+            height: 270px;
+            overflow: hidden;
+            position: absolute;
+            top: 20px;
+            border-radius: 5px;
+            box-shadow: 0 5px 30px #7d70ecb7;
+        }
+
+        .cover img {
+            width: 100%;
+        }
+
+        .shell input[type=range] {
+            -webkit-appearance: none !important;
+            margin: 0px;
+            padding: 0px;
+            background: rgb(255, 255, 255);
+            height: 5px;
+            width: 150px;
+            outline: none;
+            cursor: pointer;
+            overflow: hidden;
+            border-radius: 5px;
+        }
+
+        .shell input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none !important;
+            background: #ff3677;
+            height: 5px;
+            width: 5px;
+            border-radius: 50%;
+            box-shadow: -100vw 0 0 100vw rgb(160, 200, 250);
+        }
+
+        .shell input[type=range]::-moz-range-thumb {
+            background: #ff3677;
+            height: 8px;
+            width: 8px;
+            border-radius: 100%;
+        }
+
+        .shell input[type=range]::-ms-thumb {
+            -webkit-appearance: none !important;
+            background: #ff3677;
+            height: 8px;
+            width: 8px;
+            border-radius: 100%;
+        }
+
+        .info {
+            position: absolute;
+            top: 305px;
+            text-align: center;
+        }
+
+        .info .title {
+            font-size: 35px;
+            color: rgb(40, 45, 100);
+        }
+
+        .info .singer {
+            font-size: 20px;
+            color: #6e7cf5;
+        }
+
+        .btn-box {
+            position: absolute;
+            top: 400px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .btn-box i {
+            font-size: 24px;
+            color: rgb(40, 45, 100);
+            margin: 0 30px;
+            cursor: pointer;
+        }
+
+        .btn-box i.active {
+            color: #ff3677;
+        }
+
+        .volume-box {
+            display: none;
+            position: absolute;
+            top: 370px;
+            z-index: 1;
+            padding: 0 20px;
+        }
+
+        .volume-box .volume-down {
+            position: absolute;
+            left: -15px;
+            cursor: pointer;
+            color: rgb(40, 45, 100);
+        }
+
+        .volume-box .volume-up {
+            position: absolute;
+            right: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: rgb(40, 45, 100);
+        }
+
+        .volume-box .volume-up::selection {
+            background-color: unset;
+        }
+
+        .volume-box input[type=range] {
+            height: 5px;
+            width: 150px;
+            margin: 0 0 15px 0;
+        }
+
+        .volume-box.active {
+            display: block;
+        }
+
+        .music-box {
+            position: absolute;
+            top: 445px;
+        }
+
+        .music-box input[type=range] {
+            height: 5px;
+            width: 230px;
+            margin: 0 0 10px 0;
+        }
+
+        .music-box input[type=range]::-webkit-slider-thumb {
+            height: 5px;
+            width: 7px;
+        }
+
+        .music-box .current-time {
+            position: absolute;
+            left: -35px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+            color: #252525;
+        }
+
+        .music-box .duration {
+            position: absolute;
+            right: -35px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+            color: rgb(40, 45, 100);
+        }
+
+        .music-box .play,
+        .music-box .pause {
+            position: absolute;
+            left: 50%;
+            top: 55px;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 50px;
+            border-radius: 50px;
+            background-color: rgb(160, 200, 250);
+            cursor: pointer;
+            transition: all 0.4s;
+        }
+
+        .music-box .play i,
+        .music-box .pause i {
+            font-size: 36px;
+            color: rgb(40, 45, 100);
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-48%, -50%);
+        }
+
+        .music-box .pause i {
+            font-size: 32px;
+            transform: translate(-50%, -50%);
+        }
+        video{
+            position: absolute;
+            width: 100%;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+    &lt;video src=&quot;./横版-原神-昼.mp4&quot; muted loop autoplay&gt;&lt;/video&gt;
+    &lt;div class=&quot;shell&quot;&gt;
+        &lt;div class=&quot;cover&quot;&gt;
+            &lt;img src=&quot;./1.jpg&quot; alt=&quot;&quot;&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;info&quot;&gt;
+            &lt;div class=&quot;title&quot;&gt;只因你太美&lt;/div&gt;
+            &lt;div class=&quot;singer&quot;&gt;坤坤&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;volume-box&quot;&gt;
+            &lt;span class=&quot;volume-down&quot;&gt;&lt;i class=&quot;material-icons&quot;&gt;remove&lt;/i&gt;&lt;/span&gt;
+            &lt;input type=&quot;range&quot; class=&quot;volume-range&quot; step=&quot;1&quot; value=&quot;80&quot; min=&quot;0&quot; max=&quot;100&quot;
+                oninput=&quot;music.volume = this.value/100&quot;&gt;
+            &lt;span class=&quot;volume-up&quot;&gt;&lt;i class=&quot;material-icons&quot;&gt;add&lt;/i&gt;&lt;/span&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;btn-box&quot;&gt;
+            &lt;i class=&quot;material-icons repeat&quot; onclick=&quot;handleRepeat()&quot;&gt;repeat&lt;/i&gt;
+            &lt;i class=&quot;material-icons favorite active&quot; onclick=&quot;handleFavorite()&quot;&gt;favorite&lt;/i&gt;
+            &lt;i class=&quot;material-icons volume&quot; onclick=&quot;handleVolume()&quot;&gt;volume_up&lt;/i&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;music-box&quot;&gt;
+            &lt;input type=&quot;range&quot; class=&quot;seekbar&quot; step=&quot;1&quot; value=&quot;0&quot; min=&quot;0&quot; max=&quot;100&quot; oninput=&quot;handleSeekBar()&quot;&gt;
+            &lt;audio class=&quot;music-element&quot;&gt;
+                &lt;source src=&quot;./鸡你太美.m4a&quot;&gt;
+            &lt;/audio&gt;
+            &lt;span class=&quot;current-time&quot;&gt;0:0&lt;/span&gt;&lt;span class=&quot;duration&quot;&gt;0:0&lt;/span&gt;
+            &lt;span class=&quot;play&quot; onclick=&quot;handlePlay()&quot;&gt;
+                &lt;i class=&quot;material-icons&quot;&gt;play_arrow&lt;/i&gt;
+            &lt;/span&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/body&gt;
+
+&lt;script&gt;
+    var music = document.querySelector(&#39;.music-element&#39;)
+    var playBtn = document.querySelector(&#39;.play&#39;)
+    var seekbar = document.querySelector(&#39;.seekbar&#39;)
+    var currentTime = document.querySelector(&#39;.current-time&#39;)
+    var duration = document.querySelector(&#39;.duration&#39;)
+    function handlePlay() {
+        // 如果音乐处于暂停状态
+        if (music.paused) {
+            // 播放音乐，更改按钮样式为暂停图标
+            music.play();
+            playBtn.className = &#39;pause&#39;
+            playBtn.innerHTML = &#39;&lt;i class=&quot;material-icons&quot;&gt;pause&lt;/i&gt;&#39;
+        } else {
+            // 暂停音乐，更改按钮样式为播放图标
+            music.pause();
+            playBtn.className = &#39;play&#39;
+            playBtn.innerHTML = &#39;&lt;i class=&quot;material-icons&quot;&gt;play_arrow&lt;/i&gt;&#39;
+        }
+        // 当音乐播放完毕时
+        music.addEventListener(&#39;ended&#39;, function () {
+            // 更改按钮样式为播放图标，并将音乐当前时间重置为0
+            playBtn.className = &#39;play&#39;
+            playBtn.innerHTML = &#39;&lt;i class=&quot;material-icons&quot;&gt;play_arrow&lt;/i&gt;&#39;
+            music.currentTime = 0
+        });
+    }
+    // 当音乐元素的元数据加载完毕时
+    music.onloadeddata = function () {
+        // 设置进度条最大值为音乐总时长
+        seekbar.max = music.duration// 将音乐总时长格式化为分钟和秒，并在HTML中显示出来
+        var ds = parseInt(music.duration % 60)
+        var dm = parseInt((music.duration / 60) % 60)
+        duration.innerHTML = dm + &#39;:&#39; + ds
+    }
+    // 当音乐当前播放时间更新时
+    music.ontimeupdate = function () {
+        // 将进度条的值设为当前播放时间，以实现进度条随着音乐播放而动态更新
+        seekbar.value = music.currentTime
+    }
+    // 定义处理进度条拖动的函数
+    handleSeekBar = function () {
+        // 将音乐当前播放时间设为进度条的值，以实现通过拖动进度条控制音乐播放进度
+        music.currentTime = seekbar.value
+    }
+    // 每当音乐的播放时间更新时
+    music.addEventListener(&#39;timeupdate&#39;, function () {
+        // 将音乐当前播放时间格式化为分钟和秒，并在HTML中显示出来
+        var cs = parseInt(music.currentTime % 60)
+        var cm = parseInt((music.currentTime / 60) % 60)
+        currentTime.innerHTML = cm + &#39;:&#39; + cs
+    }, false)
+    // 爱心点击变色
+    var favIcon = document.querySelector(&#39;.favorite&#39;)
+    function handleFavorite() {
+        favIcon.classList.toggle(&#39;active&#39;);
+    }
+    // 循环播放
+    var repIcon = document.querySelector(&#39;.repeat&#39;)
+    function handleRepeat() {
+        if (music.loop == true) {
+            music.loop = false
+            repIcon.classList.toggle(&#39;active&#39;)
+        }
+        else {
+            music.loop = true
+            repIcon.classList.toggle(&#39;active&#39;)
+        }
+    }
+    // 获取 HTML 中的音量图标、音量控制器、音量滑动条、音量减小按钮和音量增加按钮
+    var volIcon = document.querySelector(&#39;.volume&#39;);
+    var volBox = document.querySelector(&#39;.volume-box&#39;);
+    var volumeRange = document.querySelector(&#39;.volume-range&#39;);
+    var volumeDown = document.querySelector(&#39;.volume-down&#39;);
+    var volumeUp = document.querySelector(&#39;.volume-up&#39;);
+    // 处理音量控制器的函数
+    function handleVolume() {
+        // 切换音量图标和音量控制器的 class 属性
+        volIcon.classList.toggle(&#39;active&#39;);
+        volBox.classList.toggle(&#39;active&#39;);
+    }
+    // 为音量减小按钮和音量增加按钮分别添加 click 事件监听器，
+    // 调用 handleVolumeDown 和 handleVolumeUp 函数
+    volumeDown.addEventListener(&#39;click&#39;, handleVolumeDown);
+    volumeUp.addEventListener(&#39;click&#39;, handleVolumeUp);
+    // 处理音量减小的函数
+    function handleVolumeDown() {
+        // 将音量滑动条的值减少 20
+        volumeRange.value = Number(volumeRange.value) - 20;
+        // 将音乐的音量设置为音量滑动条的值除以 100
+        music.volume = volumeRange.value / 100;
+    }
+    // 处理音量增加的函数
+    function handleVolumeUp() {
+        // 将音量滑动条的值增加 20
+        volumeRange.value = Number(volumeRange.value) + 20;
+        // 将音乐的音量设置为音量滑动条的值除以 100
+        music.volume = volumeRange.value / 100;
+    }
+
+&lt;/script&gt;
+
+&lt;/html&gt;
